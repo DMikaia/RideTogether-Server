@@ -8,31 +8,84 @@ datasource db {
 }
 
 model User {
-  id             String    @id @unique @default(uuid())
-  email          String    @unique
-  firstName      String    @map("first_name")
-  lastName       String    @map("last_name")
-  image          String?
+  id        String  @id @unique @default(uuid())
+  email     String  @unique
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  image     String?
 
-  creationDate   DateTime  @default(now()) @map("creation_date")
-  updateDate     DateTime  @updatedAt @map("update_date")
+  creationDate DateTime @default(now()) @map("creation_date")
+  updateDate   DateTime @updatedAt @map("update_date")
 
-  reviewsGiven   Review[]  @relation("ReviewerReviews")
+  reviewsGiven    Review[] @relation("ReviewerReviews")
   reviewsReceived Review[] @relation("RecipientReviews")
+
+  messagesSent     Message[] @relation("SentMessages")
+
+  offers Offer[] @relation("OwnerOffers")
+
+  conversationsAsParticipant Conversation[] @relation("UserConversationsAsParticipant")
+  conversationsAsOwner       Conversation[] @relation("UserConversationsAsOwner")
+
+  offersParticipated Offer[] @relation("OfferParticipants")
 
   @@index([id, email])
   @@map("users")
 }
 
 model Review {
-  id            Int      @id @default(autoincrement())
-  text          String
-  stars         Int
-  reviewerId    String   @map("reviewer_id")
-  recipientId   String   @map("recipient_id")
+  id          Int    @id @default(autoincrement())
+  text        String
+  stars       Int
+  reviewerId  String @map("reviewer_id")
+  recipientId String @map("recipient_id")
 
-  reviewer      User     @relation("ReviewerReviews", fields: [reviewerId], references: [id])
-  recipient     User     @relation("RecipientReviews", fields: [recipientId], references: [id])
+  reviewer  User @relation("ReviewerReviews", fields: [reviewerId], references: [id])
+  recipient User @relation("RecipientReviews", fields: [recipientId], references: [id])
 
   @@map("reviews")
+}
+
+model Offer {
+  id               String   @id @unique @default(uuid())
+  departurePlace   String   @map("departure_place")
+  destinationPlace String   @map("destination_place")
+  departureDate    DateTime @map("departure_date")
+
+  closed Boolean @default(false)
+  seats  Int
+
+  participants  User[] @relation("OfferParticipants")
+
+  ownerId       String @map("owner_id")
+  owner         User   @relation("OwnerOffers", fields: [ownerId], references: [id])
+
+  conversation  Conversation?  @relation("OfferConversations")
+
+  @@map("offers")
+}
+
+model Conversation {
+  id           String    @id @unique @default(uuid())
+  name         String
+  offerId      String    @unique() @map("offer_id")
+  offer        Offer     @relation("OfferConversations", fields: [offerId], references: [id])
+  ownerId      String    @map("owner_id")
+  owner        User      @relation("UserConversationsAsOwner", fields: [ownerId], references: [id])
+  participants User[]    @relation("UserConversationsAsParticipant")
+  messages     Message[] @relation("ConversationMessages")
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String  @id @unique @default(uuid())
+  senderId       String  @map("sender_id")
+  content        String
+  conversationId String  @unique() @map("conversation_id")
+
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+  conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
+
+  @@map("messages")
 }
