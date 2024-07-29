@@ -19,6 +19,16 @@ export class UserService {
     await this.prismaService.client.user.create({ data: user });
   }
 
+  async updateUser(
+    email: string,
+    information: Prisma.UserUpdateInput,
+  ): Promise<void> {
+    await this.prismaService.client.user.update({
+      data: information,
+      where: { email },
+    });
+  }
+
   async getUser(email: string): Promise<UserDto | undefined> {
     const user = await this.prismaService.client.user.findFirst({
       where: { email },

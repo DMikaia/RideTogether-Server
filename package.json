@@ -31,6 +31,7 @@
     "@ts-rest/nest": "^3.48.1",
     "class-transformer": "^0.5.1",
     "firebase-admin": "^12.3.0",
+    "helmet": "^7.1.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",

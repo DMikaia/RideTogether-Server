@@ -38,6 +38,13 @@ export class AuthController {
         // Creating user in Postgres and Firebase authentication
         await this.userService.createUser(data as Prisma.UserCreateInput);
         await this.authService.createUserInFirebase(data.email, password);
+
+        return {
+          status: HttpStatus.CREATED,
+          body: {
+            message: 'User created successfully',
+          },
+        };
       } catch (error) {
         if (error instanceof TsRestException) throw error;
         this.logger.error(`Error at /register: ${error}`);
