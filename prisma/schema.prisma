@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(uuid())
+  id             String    @id @unique @default(uuid())
   email          String    @unique
   firstName      String    @map("first_name")
   lastName       String    @map("last_name")
@@ -20,6 +20,7 @@ model User {
   reviewsGiven   Review[]  @relation("ReviewerReviews")
   reviewsReceived Review[] @relation("RecipientReviews")
 
+  @@index([id, email])
   @@map("users")
 }
 
