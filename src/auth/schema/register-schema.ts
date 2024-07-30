@@ -2,11 +2,17 @@ import { z } from 'zod';
 
 export const registerSchema = z
   .object({
-    firstName: z.string().min(1, { message: 'First Name is required' }),
-    lastName: z.string().min(1, { message: 'Last name is required' }),
-    email: z.string().email({ message: 'Email must be valid' }),
+    name: z
+      .string({ required_error: 'Full name is required' })
+      .min(1, { message: 'Full name is required' }),
+    username: z
+      .string({ required_error: 'Username is required' })
+      .min(1, { message: 'Username is required' }),
+    email: z
+      .string({ required_error: 'Email is required ' })
+      .email({ message: 'Email must be valid' }),
     password: z
-      .string()
+      .string({ required_error: 'Password is required' })
       .min(8, { message: 'Password must be at least 8 characters' })
       .max(16, { message: ' Password maximum characters is 16' }),
   })

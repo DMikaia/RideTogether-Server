@@ -1,12 +1,29 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { TsRestException } from '@ts-rest/nest';
-import { DecodedIdToken } from 'firebase-admin/auth';
+import { DecodedIdToken, FirebaseAuthError } from 'firebase-admin/auth';
 import { admin } from 'src/firebase/firebase.service';
 import { authContract } from './auth-contract';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+
+  async checkEmail(email: string): Promise<boolean> {
+    try {
+      const user = await admin.auth().getUserByEmail(email);
+
+      if (user) {
+        return true;
+      }
+    } catch (error) {
+      if (
+        error instanceof FirebaseAuthError &&
+        error.code === 'auth/user-not-found'
+      ) {
+        return false;
+      }
+    }
+  }
 
   async createUserInFirebase(email: string, password: string) {
     return admin.auth().createUser({ email, password });

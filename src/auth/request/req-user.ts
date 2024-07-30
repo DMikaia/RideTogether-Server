@@ -1,9 +1,9 @@
 import { Request } from 'express';
 
-export type ReqWithUser = Request & {
-  user: {
+export interface ReqWithUser extends Request {
+  user?: {
     uid: string;
     email: string;
   };
-  token: string;
-};
+  token?: string;
+}

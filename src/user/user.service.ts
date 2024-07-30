@@ -7,9 +7,10 @@ import { UserDto } from './dto/user.dto';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async checkIfUserExists(email: string): Promise<boolean> {
+  async checkIfUserExists(username: string): Promise<boolean> {
     const user = await this.prismaService.client.user.findFirst({
-      where: { email },
+      where: { username },
+      select: { username: true },
     });
 
     return user ? true : false;
@@ -33,8 +34,8 @@ export class UserService {
     const user = await this.prismaService.client.user.findFirst({
       where: { email },
       select: {
-        firstName: true,
-        lastName: true,
+        name: true,
+        username: true,
         image: true,
         email: true,
       },

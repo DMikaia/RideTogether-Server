@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Logger } from '@nestjs/common';
+import { Controller, HttpStatus, Logger, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { userContract } from './user-contract';
@@ -42,7 +42,7 @@ export class UserController {
 
   @Auth()
   @TsRestHandler(userContract.me)
-  async getUser(req: ReqWithUser) {
+  async getUser(@Req() req: ReqWithUser) {
     return tsRestHandler(userContract.me, async () => {
       try {
         const information = await this.userService.getUser(req.user.email);

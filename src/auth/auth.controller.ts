@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Logger } from '@nestjs/common';
+import { Controller, HttpStatus, Logger, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
@@ -16,18 +16,52 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
+  @TsRestHandler(authContract.check)
+  async checkEmail() {
+    return tsRestHandler(authContract.check, async ({ body }) => {
+      try {
+        const response = await this.authService.checkEmail(body.email);
+
+        if (response) {
+          return {
+            status: HttpStatus.CONFLICT,
+            body: {
+              message: 'The email address is already in use',
+            },
+          };
+        }
+
+        return {
+          status: HttpStatus.OK,
+          body: {
+            message: 'The email address is not used yet',
+          },
+        };
+      } catch (error) {
+        if (error instanceof TsRestException) throw error;
+        this.logger.error(`Error at /register: ${error}`);
+        return {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          body: {
+            message: 'Internal server error',
+          },
+        };
+      }
+    });
+  }
+
   @TsRestHandler(authContract.register)
   async register() {
     return tsRestHandler(authContract.register, async ({ body }) => {
       try {
-        const exist = await this.userService.checkIfUserExists(body.email);
+        const exist = await this.userService.checkIfUserExists(body.username);
 
         if (exist) {
           // We throw an error if the user already exists
           return {
             status: HttpStatus.CONFLICT,
             body: {
-              message: 'Email already taken',
+              message: 'Username already taken',
             },
           };
         }
@@ -67,15 +101,10 @@ export class AuthController {
         const payload = await this.authService.verifyToken(accessToken);
 
         if (payload) {
-          const user = await this.userService.getUser(
-            payload.decodedToken.email,
-          );
-
           const { sessionCookie, expiresIn } =
             await this.authService.createSessionCookie(accessToken);
 
           const data = {
-            user,
             expiration: expiresIn,
             cookie: sessionCookie,
           };
@@ -101,7 +130,7 @@ export class AuthController {
 
   @Auth()
   @TsRestHandler(authContract.logout)
-  public async logout(request: ReqWithUser) {
+  public async logout(@Req() request: ReqWithUser) {
     return tsRestHandler(authContract.logout, async () => {
       try {
         const accessToken = request.token;

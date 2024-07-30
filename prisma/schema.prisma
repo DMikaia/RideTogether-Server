@@ -9,9 +9,9 @@ datasource db {
 
 model User {
   id        String  @id @unique @default(uuid())
+  username  String  @unique
+  name      String  @unique
   email     String  @unique
-  firstName String  @map("first_name")
-  lastName  String  @map("last_name")
   image     String?
 
   creationDate DateTime @default(now()) @map("creation_date")

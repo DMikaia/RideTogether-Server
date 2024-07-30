@@ -6,6 +6,22 @@ import { AuthDto } from './dto/auth.dto';
 const c = initContract();
 
 export const authContract = c.router({
+  check: {
+    method: 'POST',
+    path: '/email',
+    body: z.object({
+      email: z
+        .string({ required_error: 'Email is required ' })
+        .email('Email must be valid'),
+    }),
+    strictStatusCodes: true,
+    responses: {
+      200: c.type<{ message: string }>(),
+      400: c.type<{ message: string }>(),
+      409: c.type<{ message: string }>(),
+      500: c.type<{ message: string }>(),
+    },
+  },
   register: {
     method: 'POST',
     path: '/register',
@@ -23,7 +39,9 @@ export const authContract = c.router({
     path: '/login',
     body: c.type<null>(),
     headers: z.object({
-      authorization: z.string().startsWith('Bearer '),
+      authorization: z
+        .string({ required_error: 'Token required' })
+        .startsWith('Bearer '),
     }),
     strictStatusCodes: true,
     responses: {
@@ -40,7 +58,9 @@ export const authContract = c.router({
     path: '/logout',
     body: c.type<null>(),
     headers: z.object({
-      authorization: z.string().startsWith('Bearer '),
+      authorization: z
+        .string({ required_error: 'Token required' })
+        .startsWith('Bearer '),
     }),
     strictStatusCodes: true,
     responses: {

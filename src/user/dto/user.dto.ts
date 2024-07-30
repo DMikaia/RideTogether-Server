@@ -1,6 +1,6 @@
 export type UserDto = {
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  username: string;
   image?: string;
 };
