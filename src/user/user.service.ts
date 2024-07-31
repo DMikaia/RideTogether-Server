@@ -34,6 +34,7 @@ export class UserService {
     const user = await this.prismaService.client.user.findFirst({
       where: { email },
       select: {
+        id: true,
         name: true,
         username: true,
         image: true,
