@@ -51,9 +51,13 @@ model Offer {
   departurePlace   String   @map("departure_place")
   destinationPlace String   @map("destination_place")
   departureDate    DateTime @map("departure_date")
+  image            String?
+  vehicle          String
+  createdAt        DateTime @default(now()) @db.Timestamptz()
 
   closed Boolean @default(false)
   seats  Int
+  taken  Int     @default(0)
 
   participants  User[] @relation("OfferParticipants")
 
