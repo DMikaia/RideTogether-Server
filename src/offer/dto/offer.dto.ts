@@ -14,7 +14,7 @@ export type Offer = {
 };
 
 export type CurrentOffer = Offer & {
-  conversation: {
+  room: {
     id: string;
   };
 };

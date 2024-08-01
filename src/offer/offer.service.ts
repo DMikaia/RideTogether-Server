@@ -94,7 +94,7 @@ export class OfferService {
         departureDate: true,
         image: true,
         vehicle: true,
-        conversation: {
+        room: {
           select: {
             id: true,
           },

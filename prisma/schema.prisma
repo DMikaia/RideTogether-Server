@@ -24,8 +24,8 @@ model User {
 
   offers Offer[] @relation("OwnerOffers")
 
-  conversationsAsParticipant Conversation[] @relation("UserConversationsAsParticipant")
-  conversationsAsOwner       Conversation[] @relation("UserConversationsAsOwner")
+  roomAsParticipant Room[] @relation("UserRoomsAsParticipant")
+  roomAsOwner       Room[] @relation("UserRoomsAsOwner")
 
   offersParticipated Offer[] @relation("OfferParticipants")
 
@@ -39,6 +39,9 @@ model Review {
   stars       Int
   reviewerId  String @map("reviewer_id")
   recipientId String @map("recipient_id")
+
+  offerId     String @map("offer_id")
+  offer       Offer @relation("offerReviews", fields: [offerId], references: [id])
 
   reviewer  User @relation("ReviewerReviews", fields: [reviewerId], references: [id])
   recipient User @relation("RecipientReviews", fields: [recipientId], references: [id])
@@ -60,36 +63,39 @@ model Offer {
   taken  Int     @default(0)
 
   participants  User[] @relation("OfferParticipants")
+  reviews       Review[] @relation("offerReviews")
 
   ownerId       String @map("owner_id")
   owner         User   @relation("OwnerOffers", fields: [ownerId], references: [id])
 
-  conversation  Conversation?  @relation("OfferConversations")
+  room  Room?  @relation("OfferRooms")
 
   @@map("offers")
 }
 
-model Conversation {
+model Room {
   id           String    @id @unique @default(uuid())
-  name         String
+  name         String    @unique
   offerId      String    @unique() @map("offer_id")
-  offer        Offer     @relation("OfferConversations", fields: [offerId], references: [id])
+  offer        Offer     @relation("OfferRooms", fields: [offerId], references: [id])
   ownerId      String    @map("owner_id")
-  owner        User      @relation("UserConversationsAsOwner", fields: [ownerId], references: [id])
-  participants User[]    @relation("UserConversationsAsParticipant")
-  messages     Message[] @relation("ConversationMessages")
+  owner        User      @relation("UserRoomsAsOwner", fields: [ownerId], references: [id])
+  participants User[]    @relation("UserRoomsAsParticipant")
+  messages     Message[] @relation("RoomMessages")
 
-  @@map("conversations")
+  @@map("rooms")
 }
 
 model Message {
   id             String  @id @unique @default(uuid())
   senderId       String  @map("sender_id")
   content        String
-  conversationId String  @unique() @map("conversation_id")
+  roomId String  @map("conversation_id")
+
+  createdAt      DateTime @default(now()) @db.Timestamptz()
 
   sender       User         @relation("SentMessages", fields: [senderId], references: [id])
-  conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
+  room         Room @relation("RoomMessages", fields: [roomId], references: [id])
 
   @@map("messages")
 }
