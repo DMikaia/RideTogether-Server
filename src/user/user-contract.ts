@@ -9,12 +9,21 @@ export const userContract = c.router({
     method: 'POST',
     path: '/profile',
     body: z.object({
-      image: z.string().url({ message: 'Image must be a valid url' }),
+      image: z
+        .string()
+        .url({ message: 'Profile picture must be a valid url' })
+        .optional(),
+      cover: z
+        .string()
+        .url({ message: 'Cover image must be a valid url' })
+        .optional(),
     }),
     strictStatusCodes: true,
     responses: {
       200: c.type<{ message: string }>(),
       400: c.type<{ message: string }>(),
+      401: c.type<{ message: string }>(),
+      403: c.type<{ message: string }>(),
       404: c.type<{ message: string }>(),
       500: c.type<{ message: string }>(),
     },

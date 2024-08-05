@@ -17,10 +17,10 @@ export class UserController {
   async uploadProfile(@Req() req: ReqWithUser) {
     return tsRestHandler(userContract.uploadProfile, async ({ body }) => {
       try {
-        await this.userService.updateUser(
-          req.user.email,
-          body.image as Prisma.UserUpdateInput,
-        );
+        await this.userService.updateUser(req.user.email, {
+          image: body.image,
+          coverPicture: body.cover,
+        } as Prisma.UserUpdateInput);
 
         return {
           status: HttpStatus.OK,

@@ -13,6 +13,7 @@ model User {
   name      String  @unique
   email     String  @unique
   image     String?
+  coverPicture String? @map("cover_picture")
 
   creationDate DateTime @default(now()) @map("creation_date")
   updateDate   DateTime @updatedAt @map("update_date")
