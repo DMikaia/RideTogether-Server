@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from './dto/user.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly redisService: RedisService,
+  ) {}
 
   async checkIfUserExists(username: string): Promise<boolean> {
     const user = await this.prismaService.client.user.findFirst({
@@ -24,13 +28,51 @@ export class UserService {
     email: string,
     information: Prisma.UserUpdateInput,
   ): Promise<void> {
-    await this.prismaService.client.user.update({
+    const user = await this.prismaService.client.user.update({
       data: information,
       where: { email },
+      select: {
+        image: true,
+      },
     });
+
+    const data = await this.redisService.getCachedData<UserDto>(
+      `user:${email}`,
+    );
+
+    if (data) {
+      await this.redisService.updateData<UserDto>(
+        `user:${email}`,
+        { image: user.image, ...data },
+        1500,
+      );
+    }
+  }
+
+  async removeUser(email: string) {
+    await this.redisService.removeData(`user:${email}`);
+  }
+
+  async getUserId(email: string) {
+    const user = await this.prismaService.client.user.findFirst({
+      where: { email },
+      select: {
+        id: true,
+      },
+    });
+
+    return user.id;
   }
 
   async getUser(email: string): Promise<UserDto | undefined> {
+    const data = await this.redisService.getCachedData<UserDto>(
+      `user:${email}`,
+    );
+
+    if (data) {
+      return data;
+    }
+
     const user = await this.prismaService.client.user.findFirst({
       where: { email },
       select: {
@@ -43,6 +85,12 @@ export class UserService {
     });
 
     if (user) {
+      await this.redisService.setCachedData<UserDto>(
+        `user:${email}`,
+        user,
+        1500,
+      );
+
       return user;
     }
 

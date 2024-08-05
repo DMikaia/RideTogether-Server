@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { RedisModule } from './redis/redis.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './redis/redis.resolver';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RedisOptions } from './redis/redis.resolver';
     UserModule,
     OfferModule,
     ChatModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [PrismaService],

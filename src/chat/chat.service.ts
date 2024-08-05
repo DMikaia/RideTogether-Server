@@ -1,20 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
-import { Room } from './interfaces/room.interface';
-import { Message } from './interfaces/message.interface';
+import { MessageSelect } from './select/message.select';
 
 @Injectable()
 export class ChatService {
-  private readonly logger = new Logger(ChatService.name);
-
   constructor(
-    private prisma: PrismaService,
-    private redisService: RedisService,
+    private readonly prismaService: PrismaService,
+    private readonly redisService: RedisService,
   ) {}
 
   async createRoom(ownerId: string, name: string, offerId: string) {
-    return await this.prisma.client.room.create({
+    return await this.prismaService.client.room.create({
       data: {
         name,
         owner: {
@@ -37,7 +34,7 @@ export class ChatService {
   }
 
   async addNewUser(userId: string, roomId: string) {
-    return await this.prisma.client.room.update({
+    return await this.prismaService.client.room.update({
       where: { id: roomId },
       data: {
         participants: {
@@ -53,14 +50,14 @@ export class ChatService {
   }
 
   async addNewMessage(sender: string, content: string, name: string) {
-    const room = await this.prisma.client.room.findFirst({
+    const room = await this.prismaService.client.room.findFirst({
       where: { name },
       select: {
         id: true,
       },
     });
 
-    return await this.prisma.client.message.create({
+    return await this.prismaService.client.message.create({
       data: {
         content,
         sender: {
@@ -72,95 +69,53 @@ export class ChatService {
           connect: { id: room.id },
         },
       },
-      select: {
-        createdAt: true,
-      },
+      select: MessageSelect,
     });
   }
 
-  async createSocketRoom(name: string) {
-    const room = await this.prisma.client.room.findFirst({
-      where: { name },
-      select: {
-        id: true,
-        name: true,
-        messages: {
-          select: {
-            content: true,
-            createdAt: true,
-            sender: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-                image: true,
-              },
-            },
-          },
-        },
-        ownerId: true,
-        participants: {
-          select: {
-            id: true,
-          },
+  async getMessagesByRoom(name: string) {
+    return this.prismaService.client.message.findMany({
+      where: {
+        room: {
+          name,
         },
       },
+      select: MessageSelect,
     });
-
-    if (room) {
-      await this.redisService.setCachedData<Room>(
-        `socket:${room.name}`,
-        room,
-        0,
-      );
-
-      return room;
-    }
   }
 
   async isUserInRoom(name: string, userId: string) {
-    const data = await this.redisService.getCachedData<Room>(`socket:${name}`);
+    const data = await this.prismaService.client.room.findFirst({
+      where: {
+        name,
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
 
     if (data) {
-      return data.participants.find((p) => p.id === userId) ? true : false;
+      return true;
     }
 
-    const room = await this.createSocketRoom(name);
-
-    return room.participants.find((p) => p.id === userId) ? true : false;
+    return false;
   }
 
   async getUserSocketId(id: string) {
-    return await this.redisService.getCachedData<string>(`User:${id}`);
+    return await this.redisService.getCachedData<string>(`chat-user:${id}`);
   }
 
   async addSocketIdToUser(id: string, socketId: string) {
-    await this.redisService.setCachedData<string>(`User:${id}`, socketId, 0);
+    await this.redisService.setCachedData<string>(
+      `chat-user:${id}`,
+      socketId,
+      0,
+    );
   }
 
   async removeSocketIdFromUser(id: string) {
-    await this.redisService.removeData(`User${id}`);
-  }
-
-  async updateMessage(message: Message, name: string) {
-    const data = await this.redisService.getCachedData<Room>(`socket:${name}`);
-
-    if (data) {
-      data.messages.push(message);
-
-      await this.redisService.updateData<Room>(`socket:${name}`, data, 86400);
-    }
-  }
-
-  async getMessagesByRoom(userId: string, name: string) {
-    const data = await this.redisService.getCachedData<Room>(`socket:${name}`);
-
-    if (data) {
-      const user = data.participants.find((e) => e.id === userId);
-
-      if (user) {
-        return data.messages;
-      }
-    }
+    await this.redisService.removeData(`chat-user:${id}`);
   }
 }

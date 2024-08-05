@@ -1,17 +1,20 @@
 import { initContract } from '@ts-rest/core';
-import { offerSchema } from './schema/offer-schema';
+import { createSchema } from './schema/create-review';
+import { updateSchema } from './schema/update-review';
 import { z } from 'zod';
-import { CurrentOffer, Offer } from './dto/offer.dto';
+import { ReviewDto } from './dto/review.dto';
 
 const c = initContract();
 
-export const offerContract = c.router({
-  createOffer: {
+export const reviewContract = c.router({
+  create: {
     method: 'POST',
-    path: '/offer',
-    body: offerSchema,
+    path: '/review',
+    body: createSchema,
     headers: z.object({
-      authorization: z.string().startsWith('Bearer '),
+      authorization: z
+        .string({ required_error: 'Token required' })
+        .startsWith('Bearer '),
     }),
     strictStatusCodes: true,
     responses: {
@@ -22,10 +25,10 @@ export const offerContract = c.router({
       500: c.type<{ message: string }>(),
     },
   },
-  addParticipant: {
+  update: {
     method: 'PATCH',
-    path: '/offer/:id',
-    body: c.type<null>(),
+    path: '/review/:id',
+    body: updateSchema,
     headers: z.object({
       authorization: z
         .string({ required_error: 'Token required' })
@@ -37,61 +40,40 @@ export const offerContract = c.router({
       400: c.type<{ message: string }>(),
       401: c.type<{ message: string }>(),
       403: c.type<{ message: string }>(),
-      404: c.type<{ message: string }>(),
       500: c.type<{ message: string }>(),
     },
   },
-  getAllOffer: {
+  get: {
     method: 'GET',
-    path: '/offer',
+    path: '/review/:id',
+    strictStatusCodes: true,
     headers: z.object({
       authorization: z
         .string({ required_error: 'Token required' })
         .startsWith('Bearer '),
     }),
-    strictStatusCodes: true,
     responses: {
-      200: c.type<Offer[]>(),
+      200: c.type<ReviewDto[]>(),
       400: c.type<{ message: string }>(),
       401: c.type<{ message: string }>(),
       403: c.type<{ message: string }>(),
-      404: c.type<{ message: string }>(),
       500: c.type<{ message: string }>(),
     },
   },
-  getMyOffer: {
-    method: 'GET',
-    path: '/offer/:id',
+  delete: {
+    method: 'DELETE',
+    path: 'review/:id',
+    body: c.type<null>(),
     headers: z.object({
       authorization: z
         .string({ required_error: 'Token required' })
         .startsWith('Bearer '),
     }),
-    strictStatusCodes: true,
     responses: {
-      200: c.type<CurrentOffer[]>(),
+      200: c.type<{ message: string }>(),
       400: c.type<{ message: string }>(),
       401: c.type<{ message: string }>(),
       403: c.type<{ message: string }>(),
-      404: c.type<{ message: string }>(),
-      500: c.type<{ message: string }>(),
-    },
-  },
-  getUserOffer: {
-    method: 'GET',
-    path: '/offers/:id',
-    headers: z.object({
-      authorization: z
-        .string({ required_error: 'Token required' })
-        .startsWith('Bearer '),
-    }),
-    strictStatusCodes: true,
-    responses: {
-      200: c.type<Offer[]>(),
-      400: c.type<{ message: string }>(),
-      401: c.type<{ message: string }>(),
-      403: c.type<{ message: string }>(),
-      404: c.type<{ message: string }>(),
       500: c.type<{ message: string }>(),
     },
   },

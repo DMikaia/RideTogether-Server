@@ -38,7 +38,7 @@ export class OfferController {
         }
       } catch (error) {
         if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /register: ${error}`);
+        this.logger.error(`Error at /offer: ${error}`);
         return {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           body: {
@@ -131,6 +131,17 @@ export class OfferController {
     return tsRestHandler(offerContract.addParticipant, async () => {
       try {
         const user = await this.userService.getUser(req.user.email);
+
+        const isFull = await this.offerService.isOfferFull(id);
+
+        if (isFull) {
+          return {
+            status: HttpStatus.BAD_REQUEST,
+            body: {
+              message: 'This offer is already full',
+            },
+          };
+        }
 
         await this.offerService.addPariticipant(user.id, id);
 

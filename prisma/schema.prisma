@@ -34,14 +34,13 @@ model User {
 }
 
 model Review {
-  id          Int    @id @default(autoincrement())
+  id          String @id @unique @default(uuid())
   text        String
-  stars       Int
+  stars       Float
   reviewerId  String @map("reviewer_id")
   recipientId String @map("recipient_id")
 
-  offerId     String @map("offer_id")
-  offer       Offer @relation("offerReviews", fields: [offerId], references: [id])
+  createdAt   DateTime @default(now())
 
   reviewer  User @relation("ReviewerReviews", fields: [reviewerId], references: [id])
   recipient User @relation("RecipientReviews", fields: [recipientId], references: [id])
@@ -63,7 +62,6 @@ model Offer {
   taken  Int     @default(0)
 
   participants  User[] @relation("OfferParticipants")
-  reviews       Review[] @relation("offerReviews")
 
   ownerId       String @map("owner_id")
   owner         User   @relation("OwnerOffers", fields: [ownerId], references: [id])

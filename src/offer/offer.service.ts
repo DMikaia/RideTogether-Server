@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CurrentOffer, Offer } from './dto/offer.dto';
+import { offerSelect, currentOfferSelect } from './select/offer.select';
 
 @Injectable()
 export class OfferService {
@@ -21,22 +22,7 @@ export class OfferService {
           },
         ],
       },
-      select: {
-        owner: {
-          select: {
-            username: true,
-            image: true,
-          },
-        },
-        seats: true,
-        taken: true,
-        closed: true,
-        departurePlace: true,
-        destinationPlace: true,
-        departureDate: true,
-        image: true,
-        vehicle: true,
-      },
+      select: offerSelect,
     });
   }
 
@@ -45,27 +31,12 @@ export class OfferService {
       where: {
         closed: false,
       },
-      select: {
-        owner: {
-          select: {
-            username: true,
-            image: true,
-          },
-        },
-        closed: true,
-        seats: true,
-        taken: true,
-        departurePlace: true,
-        destinationPlace: true,
-        departureDate: true,
-        image: true,
-        vehicle: true,
-      },
+      select: offerSelect,
     });
   }
 
-  async getMyCurrentOffer(userId: string): Promise<CurrentOffer> {
-    return await this.prismaService.client.offer.findFirst({
+  async getMyCurrentOffer(userId: string): Promise<CurrentOffer[]> {
+    return await this.prismaService.client.offer.findMany({
       where: {
         closed: false,
         OR: [
@@ -79,27 +50,7 @@ export class OfferService {
           },
         ],
       },
-      select: {
-        owner: {
-          select: {
-            username: true,
-            image: true,
-          },
-        },
-        closed: true,
-        seats: true,
-        taken: true,
-        departurePlace: true,
-        destinationPlace: true,
-        departureDate: true,
-        image: true,
-        vehicle: true,
-        room: {
-          select: {
-            id: true,
-          },
-        },
-      },
+      select: currentOfferSelect,
     });
   }
 
@@ -115,6 +66,11 @@ export class OfferService {
             id: ownerId,
           },
         },
+        participants: {
+          connect: {
+            id: ownerId,
+          },
+        },
       },
       select: {
         id: true,
@@ -122,6 +78,20 @@ export class OfferService {
     });
 
     return newOffer.id;
+  }
+
+  async isOfferFull(offerId: string) {
+    const offer = await this.prismaService.client.offer.findFirst({
+      where: {
+        id: offerId,
+      },
+    });
+
+    if (offer.taken === offer.seats) {
+      return true;
+    }
+
+    return false;
   }
 
   async addPariticipant(userId: string, offerId: string): Promise<void> {

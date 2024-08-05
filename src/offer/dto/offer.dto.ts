@@ -16,5 +16,6 @@ export type Offer = {
 export type CurrentOffer = Offer & {
   room: {
     id: string;
+    name: string;
   };
 };

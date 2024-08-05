@@ -1,5 +1,3 @@
-import { Message } from './message.interface';
-
 export interface Room {
   id: string;
   name: string;
@@ -7,5 +5,4 @@ export interface Room {
   participants: {
     id: string;
   }[];
-  messages: Message[];
 }

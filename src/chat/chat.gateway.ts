@@ -52,10 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       room,
     );
 
-    const response = { createdAt: newMessage.createdAt, ...body };
-
-    this.server.to(room).emit('chat', response);
-    await this.chatService.updateMessage(response, room);
+    this.server.to(room).emit('chat', newMessage);
   }
 
   @SubscribeMessage('join')
@@ -69,6 +66,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Socket ID ${client.id} is joining room ${roomName}`);
       client.join(roomName);
     } else {
+      await this.chatService.removeSocketIdFromUser(userId);
+      client.disconnect();
       this.logger.warn(`User ${userId} is not part of room ${roomName}`);
     }
   }
@@ -81,13 +80,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const isPart = await this.chatService.isUserInRoom(roomName, userId);
 
     if (isPart) {
-      const messages = await this.chatService.getMessagesByRoom(
-        userId,
-        roomName,
-      );
+      const messages = await this.chatService.getMessagesByRoom(roomName);
 
       client.emit('messages', messages);
     } else {
+      await this.chatService.removeSocketIdFromUser(userId);
+      client.disconnect();
       this.logger.warn(`User ${userId} is not part of room ${roomName}`);
     }
   }

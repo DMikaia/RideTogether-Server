@@ -9,7 +9,6 @@ export const userContract = c.router({
     method: 'POST',
     path: '/profile',
     body: z.object({
-      email: z.string().email('Email should be a valid one'),
       image: z.string().url({ message: 'Image must be a valid url' }),
     }),
     strictStatusCodes: true,

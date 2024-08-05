@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { ReqWithUser } from 'src/auth/request/req-user';
 
+@Auth()
 @Controller()
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -13,11 +14,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @TsRestHandler(userContract.uploadProfile)
-  async uploadProfile() {
+  async uploadProfile(@Req() req: ReqWithUser) {
     return tsRestHandler(userContract.uploadProfile, async ({ body }) => {
       try {
         await this.userService.updateUser(
-          body.email,
+          req.user.email,
           body.image as Prisma.UserUpdateInput,
         );
 
@@ -29,7 +30,7 @@ export class UserController {
         };
       } catch (error) {
         if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /register: ${error}`);
+        this.logger.error(`Error at /profile: ${error}`);
         return {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           body: {
@@ -40,7 +41,6 @@ export class UserController {
     });
   }
 
-  @Auth()
   @TsRestHandler(userContract.me)
   async getUser(@Req() req: ReqWithUser) {
     return tsRestHandler(userContract.me, async () => {
@@ -55,7 +55,7 @@ export class UserController {
         }
       } catch (error) {
         if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /register: ${error}`);
+        this.logger.error(`Error at /me: ${error}`);
         return {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           body: {

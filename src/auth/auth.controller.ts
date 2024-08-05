@@ -135,6 +135,7 @@ export class AuthController {
       try {
         const accessToken = request.token;
 
+        await this.userService.removeUser(request.user.email);
         await this.authService.revokeToken(accessToken);
 
         return {
