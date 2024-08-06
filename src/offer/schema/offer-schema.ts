@@ -2,6 +2,7 @@ import z from 'zod';
 
 export const offerSchema = z
   .object({
+    room: z.string().min(1, 'Room name is required'),
     departurePlace: z.string().min(1, 'Departure place is required'),
     destinationPlace: z.string().min(1, 'Destination place is required'),
     departureDate: z

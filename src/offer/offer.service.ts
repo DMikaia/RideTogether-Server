@@ -26,10 +26,18 @@ export class OfferService {
     });
   }
 
-  async getAvailableOffers(): Promise<Offer[]> {
+  async getAvailableOffers(userId: string): Promise<Offer[]> {
     return await this.prismaService.client.offer.findMany({
       where: {
         closed: false,
+        NOT: {
+          ownerId: userId,
+          participants: {
+            some: {
+              id: userId,
+            },
+          },
+        },
       },
       select: offerSelect,
     });
@@ -56,6 +64,7 @@ export class OfferService {
 
   async createOffer(
     ownerId: string,
+    room: string,
     offer: Prisma.OfferCreateWithoutOwnerInput,
   ): Promise<string> {
     const newOffer = await this.prismaService.client.offer.create({
@@ -69,6 +78,21 @@ export class OfferService {
         participants: {
           connect: {
             id: ownerId,
+          },
+        },
+        room: {
+          create: {
+            owner: {
+              connect: {
+                id: ownerId,
+              },
+            },
+            name: room,
+            participants: {
+              connect: {
+                id: ownerId,
+              },
+            },
           },
         },
       },

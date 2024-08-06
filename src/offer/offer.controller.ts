@@ -24,9 +24,12 @@ export class OfferController {
         const user = await this.userService.getUser(req.user.email);
 
         if (user) {
+          const { room, ...data } = body;
+
           await this.offerService.createOffer(
             user.id,
-            body as Prisma.OfferCreateWithoutOwnerInput,
+            room,
+            data as Prisma.OfferCreateWithoutOwnerInput,
           );
 
           return {
@@ -56,7 +59,7 @@ export class OfferController {
         const user = await this.userService.getUser(req.user.email);
 
         if (user) {
-          const offers = await this.offerService.getAvailableOffers();
+          const offers = await this.offerService.getAvailableOffers(user.id);
 
           return {
             status: HttpStatus.OK,
