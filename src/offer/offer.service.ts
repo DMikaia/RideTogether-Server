@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CurrentOffer, Offer } from './dto/offer.dto';
+import { Offer, Room } from './dto/offer.dto';
 import { offerSelect, currentOfferSelect } from './select/offer.select';
 
 @Injectable()
@@ -11,16 +11,10 @@ export class OfferService {
   async getUserOffer(userId: string): Promise<Offer[]> {
     return await this.prismaService.client.offer.findMany({
       where: {
-        OR: [
-          { ownerId: userId },
-          {
-            participants: {
-              some: {
-                id: userId,
-              },
-            },
-          },
-        ],
+        ownerId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
       select: offerSelect,
     });
@@ -31,20 +25,27 @@ export class OfferService {
       where: {
         closed: false,
         NOT: {
-          ownerId: userId,
-          participants: {
-            some: {
-              id: userId,
+          OR: [
+            { ownerId: userId },
+            {
+              participants: {
+                some: {
+                  id: userId,
+                },
+              },
             },
-          },
+          ],
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
       select: offerSelect,
     });
   }
 
-  async getMyCurrentOffer(userId: string): Promise<CurrentOffer[]> {
-    return await this.prismaService.client.offer.findMany({
+  async getMyCurrentOffer(userId: string): Promise<Room[]> {
+    const offers = await this.prismaService.client.offer.findMany({
       where: {
         closed: false,
         OR: [
@@ -60,6 +61,12 @@ export class OfferService {
       },
       select: currentOfferSelect,
     });
+
+    const rooms: Room[] = offers.map((offer) => {
+      return offer.room;
+    });
+
+    return rooms;
   }
 
   async createOffer(
@@ -133,6 +140,19 @@ export class OfferService {
       },
       select: {
         id: true,
+      },
+    });
+
+    await this.prismaService.client.room.update({
+      where: {
+        offerId,
+      },
+      data: {
+        participants: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
   }

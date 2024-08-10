@@ -7,6 +7,7 @@ export const reviewSelect: Prisma.ReviewSelect = {
   stars: true,
   reviewer: {
     select: {
+      id: true,
       name: true,
       username: true,
       image: true,
@@ -26,6 +27,7 @@ export const reviewWithRecipientSelect: Prisma.ReviewSelect = {
   stars: true,
   reviewer: {
     select: {
+      id: true,
       name: true,
       username: true,
       image: true,

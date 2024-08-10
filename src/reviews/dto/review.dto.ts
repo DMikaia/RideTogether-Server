@@ -4,6 +4,7 @@ export class ReviewDto {
   text: string;
   stars: number;
   reviewer: {
+    id: string;
     name: string;
     username: string;
     image: string;

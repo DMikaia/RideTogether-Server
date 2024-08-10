@@ -1,7 +1,7 @@
 import { initContract } from '@ts-rest/core';
 import { offerSchema } from './schema/offer-schema';
 import { z } from 'zod';
-import { CurrentOffer, Offer } from './dto/offer.dto';
+import { Room, Offer } from './dto/offer.dto';
 
 const c = initContract();
 
@@ -61,7 +61,7 @@ export const offerContract = c.router({
   },
   getMyOffer: {
     method: 'GET',
-    path: '/offer/:id',
+    path: '/room/',
     headers: z.object({
       authorization: z
         .string({ required_error: 'Token required' })
@@ -69,7 +69,7 @@ export const offerContract = c.router({
     }),
     strictStatusCodes: true,
     responses: {
-      200: c.type<CurrentOffer[]>(),
+      200: c.type<Room[]>(),
       400: c.type<{ message: string }>(),
       401: c.type<{ message: string }>(),
       403: c.type<{ message: string }>(),
@@ -79,7 +79,7 @@ export const offerContract = c.router({
   },
   getUserOffer: {
     method: 'GET',
-    path: '/offers/:id',
+    path: '/offer/:id',
     headers: z.object({
       authorization: z
         .string({ required_error: 'Token required' })

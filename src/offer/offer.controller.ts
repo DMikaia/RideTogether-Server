@@ -80,9 +80,11 @@ export class OfferController {
   }
 
   @TsRestHandler(offerContract.getMyOffer)
-  async getMyOffer(@Param('id') id: string) {
+  async getMyOffer(@Req() req: ReqWithUser) {
     return tsRestHandler(offerContract.getMyOffer, async () => {
       try {
+        const id = await this.userService.getUserId(req.user.email);
+
         const offer = await this.offerService.getMyCurrentOffer(id);
 
         if (offer) {

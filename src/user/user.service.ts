@@ -24,12 +24,11 @@ export class UserService {
     await this.prismaService.client.user.create({ data: user });
   }
 
-  async updateUser(
-    email: string,
-    information: Prisma.UserUpdateInput,
-  ): Promise<void> {
+  async updateUser(email: string, image: string): Promise<void> {
     const user = await this.prismaService.client.user.update({
-      data: information,
+      data: {
+        image,
+      },
       where: { email },
       select: {
         image: true,
@@ -41,7 +40,7 @@ export class UserService {
     );
 
     if (data) {
-      await this.redisService.updateData<UserDto>(
+      await this.redisService.setCachedData<UserDto>(
         `user:${email}`,
         { image: user.image, ...data },
         1500,
@@ -62,6 +61,25 @@ export class UserService {
     });
 
     return user.id;
+  }
+
+  async getUserById(id: string): Promise<UserDto | undefined> {
+    const user = await this.prismaService.client.user.findFirst({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        email: true,
+      },
+    });
+
+    if (user) {
+      return user;
+    }
+
+    return null;
   }
 
   async getUser(email: string): Promise<UserDto | undefined> {

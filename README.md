@@ -31,6 +31,9 @@
 ```bash
 # command
 $ npm install
+
+# redis
+$ docker run -d --name redis-stack -p 6379:6379 -e REDIS_ARGS="--requirepass password" -p 8001:8001 redis/redis-stack:latest
 ```
 
 ## Running the app

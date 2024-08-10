@@ -54,6 +54,9 @@ export class ReviewsService {
       where: {
         recipientId: id,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       select: reviewSelect,
     });
 

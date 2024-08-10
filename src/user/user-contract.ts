@@ -13,10 +13,6 @@ export const userContract = c.router({
         .string()
         .url({ message: 'Profile picture must be a valid url' })
         .optional(),
-      cover: z
-        .string()
-        .url({ message: 'Cover image must be a valid url' })
-        .optional(),
     }),
     strictStatusCodes: true,
     responses: {
@@ -31,6 +27,21 @@ export const userContract = c.router({
   me: {
     method: 'GET',
     path: '/me',
+    headers: z.object({
+      authorization: z.string().startsWith('Bearer '),
+    }),
+    strictStatusCodes: true,
+    responses: {
+      200: c.type<UserDto>(),
+      400: c.type<{ message: string }>(),
+      401: c.type<{ message: string }>(),
+      403: c.type<{ message: string }>(),
+      500: c.type<{ message: string }>(),
+    },
+  },
+  profile: {
+    method: 'GET',
+    path: '/user/:id',
     headers: z.object({
       authorization: z.string().startsWith('Bearer '),
     }),
