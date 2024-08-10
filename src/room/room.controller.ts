@@ -5,7 +5,9 @@ import { UserService } from 'src/user/user.service';
 import { tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { roomContract } from './room-contract';
 import { ReqWithUser } from 'src/auth/request/req-user';
+import { Auth } from 'src/auth/decorator/auth.decorator';
 
+@Auth()
 @Controller()
 export class RoomController {
   constructor(
