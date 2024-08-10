@@ -1,5 +1,5 @@
-<p align="center">
-  <img src="assets/logo.png" width="200" alt="Ride Together Logo" />
+<p align="left">
+  <img src="assets/logo.png" height="200" width="200" alt="Ride Together Logo" />
 </p>
 
 ## Description
