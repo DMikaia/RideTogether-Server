@@ -11,9 +11,9 @@ This is the server part of my school project called "Ride Together" (carpooling 
 Here are the current features right now:
 
 - Basic authentication with Firebase & PostgreSQL
-- User (find, update)
-- Offer (creation, find, update)
-- Room (find)
+- User (get, update)
+- Offer (creation, get, update)
+- Room (get)
 - Review (crud)
 - Live chat using websocket (Not scalable yet)
 - Data caching with Redis
