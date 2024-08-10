@@ -1,20 +1,20 @@
-import { Controller, HttpStatus, Logger, Param, Req } from '@nestjs/common';
+import { Controller, HttpStatus, Param, Req } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
+import { tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { reviewContract } from './review-contract';
 import { UserService } from 'src/user/user.service';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { ReqWithUser } from 'src/auth/request/req-user';
 import { CreateReviewDto } from './dto/create.dto';
 import { UpdateReviewDto } from './dto/update.dto';
+import { ErrorService } from 'src/error/error.service';
 
 @Auth()
 @Controller()
 export class ReviewsController {
-  private readonly logger = new Logger(ReviewsController.name);
-
   constructor(
     private readonly reviewsService: ReviewsService,
+    private readonly errorService: ErrorService,
     private readonly userService: UserService,
   ) {}
 
@@ -33,14 +33,7 @@ export class ReviewsController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /review: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'review');
       }
     });
   }
@@ -58,14 +51,7 @@ export class ReviewsController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /review: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'review/:id');
       }
     });
   }
@@ -83,14 +69,7 @@ export class ReviewsController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /review: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'review');
       }
     });
   }
@@ -110,14 +89,7 @@ export class ReviewsController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /review: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'review');
       }
     });
   }

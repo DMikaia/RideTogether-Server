@@ -8,11 +8,11 @@ datasource db {
 }
 
 model User {
-  id        String  @id @unique @default(uuid())
-  username  String  @unique
-  name      String  @unique
-  email     String  @unique
-  image     String?
+  id       String  @id @unique @default(uuid())
+  username String  @unique
+  name     String  @unique
+  email    String  @unique
+  image    String?
 
   creationDate DateTime @default(now()) @map("creation_date")
   updateDate   DateTime @updatedAt @map("update_date")
@@ -20,7 +20,7 @@ model User {
   reviewsGiven    Review[] @relation("ReviewerReviews")
   reviewsReceived Review[] @relation("RecipientReviews")
 
-  messagesSent     Message[] @relation("SentMessages")
+  messagesSent Message[] @relation("SentMessages")
 
   offers Offer[] @relation("OwnerOffers")
 
@@ -40,7 +40,7 @@ model Review {
   reviewerId  String @map("reviewer_id")
   recipientId String @map("recipient_id")
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   reviewer  User @relation("ReviewerReviews", fields: [reviewerId], references: [id])
   recipient User @relation("RecipientReviews", fields: [recipientId], references: [id])
@@ -61,12 +61,12 @@ model Offer {
   seats  Int
   taken  Int     @default(0)
 
-  participants  User[] @relation("OfferParticipants")
+  participants User[] @relation("OfferParticipants")
 
-  ownerId       String @map("owner_id")
-  owner         User   @relation("OwnerOffers", fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+  owner   User   @relation("OwnerOffers", fields: [ownerId], references: [id])
 
-  room  Room?  @relation("OfferRooms")
+  room Room? @relation("OfferRooms")
 
   @@map("offers")
 }
@@ -85,15 +85,15 @@ model Room {
 }
 
 model Message {
-  id             String  @id @unique @default(uuid())
-  senderId       String  @map("sender_id")
-  content        String
-  roomId String  @map("conversation_id")
+  id       String @id @unique @default(uuid())
+  senderId String @map("sender_id")
+  content  String
+  roomId   String @map("conversation_id")
 
-  createdAt      DateTime @default(now()) @db.Timestamptz()
+  createdAt DateTime @default(now()) @db.Timestamptz()
 
-  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
-  room         Room @relation("RoomMessages", fields: [roomId], references: [id])
+  sender User @relation("SentMessages", fields: [senderId], references: [id])
+  room   Room @relation("RoomMessages", fields: [roomId], references: [id])
 
   @@map("messages")
 }

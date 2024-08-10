@@ -1,16 +1,18 @@
-import { Controller, HttpStatus, Logger, Param, Req } from '@nestjs/common';
+import { Controller, HttpStatus, Param, Req } from '@nestjs/common';
 import { UserService } from './user.service';
-import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
+import { tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { userContract } from './user-contract';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { ReqWithUser } from 'src/auth/request/req-user';
+import { ErrorService } from 'src/error/error.service';
 
 @Auth()
 @Controller()
 export class UserController {
-  private readonly logger = new Logger(UserController.name);
-
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly errorService: ErrorService,
+    private readonly userService: UserService,
+  ) {}
 
   @TsRestHandler(userContract.uploadProfile)
   async uploadProfile(@Req() req: ReqWithUser) {
@@ -25,14 +27,7 @@ export class UserController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /profile: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'profile');
       }
     });
   }
@@ -50,14 +45,7 @@ export class UserController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /me: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'me');
       }
     });
   }
@@ -75,14 +63,7 @@ export class UserController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /me: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'user');
       }
     });
   }

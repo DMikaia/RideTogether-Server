@@ -41,36 +41,6 @@ export class ReviewsService {
     );
   }
 
-  async findAll(id: string) {
-    const data = await this.redisService.getCachedData<ReviewDto[]>(
-      `review:${id}`,
-    );
-
-    if (data) {
-      return data;
-    }
-
-    const reviews = await this.prismaService.client.review.findMany({
-      where: {
-        recipientId: id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: reviewSelect,
-    });
-
-    if (reviews) {
-      await this.redisService.setCachedData<ReviewDto[]>(
-        `review:${id}`,
-        reviews,
-        1500,
-      );
-
-      return reviews;
-    }
-  }
-
   async update(id: string, updateReviewDto: UpdateReviewDto) {
     const review = await this.prismaService.client.review.findFirst({
       where: { id },
@@ -129,5 +99,35 @@ export class ReviewsService {
       data,
       1500,
     );
+  }
+
+  async findAll(id: string) {
+    const data = await this.redisService.getCachedData<ReviewDto[]>(
+      `review:${id}`,
+    );
+
+    if (data) {
+      return data;
+    }
+
+    const reviews = await this.prismaService.client.review.findMany({
+      where: {
+        recipientId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: reviewSelect,
+    });
+
+    if (reviews) {
+      await this.redisService.setCachedData<ReviewDto[]>(
+        `review:${id}`,
+        reviews,
+        1500,
+      );
+
+      return reviews;
+    }
   }
 }

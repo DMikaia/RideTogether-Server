@@ -1,19 +1,19 @@
-import { Controller, HttpStatus, Logger, Param, Req } from '@nestjs/common';
-import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
+import { Controller, HttpStatus, Param, Req } from '@nestjs/common';
+import { tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { UserService } from 'src/user/user.service';
 import { offerContract } from './offer-contract';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { ReqWithUser } from 'src/auth/request/req-user';
 import { OfferService } from './offer.service';
 import { Prisma } from '@prisma/client';
+import { ErrorService } from 'src/error/error.service';
 
 @Auth()
 @Controller()
 export class OfferController {
-  private readonly logger = new Logger(OfferController.name);
-
   constructor(
     private readonly offerService: OfferService,
+    private readonly errorService: ErrorService,
     private readonly userService: UserService,
   ) {}
 
@@ -40,14 +40,7 @@ export class OfferController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /offer: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'offer');
       }
     });
   }
@@ -67,41 +60,7 @@ export class OfferController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /offer: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
-      }
-    });
-  }
-
-  @TsRestHandler(offerContract.getMyOffer)
-  async getMyOffer(@Req() req: ReqWithUser) {
-    return tsRestHandler(offerContract.getMyOffer, async () => {
-      try {
-        const id = await this.userService.getUserId(req.user.email);
-
-        const offer = await this.offerService.getMyCurrentOffer(id);
-
-        if (offer) {
-          return {
-            status: HttpStatus.OK,
-            body: offer,
-          };
-        }
-      } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /offer: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'offer');
       }
     });
   }
@@ -119,14 +78,7 @@ export class OfferController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /offer: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'offer');
       }
     });
   }
@@ -136,7 +88,6 @@ export class OfferController {
     return tsRestHandler(offerContract.addParticipant, async () => {
       try {
         const user = await this.userService.getUser(req.user.email);
-
         const isFull = await this.offerService.isOfferFull(id);
 
         if (isFull) {
@@ -157,14 +108,7 @@ export class OfferController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /offer: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'offer');
       }
     });
   }

@@ -19,8 +19,3 @@ export type Offer = {
   seats: number;
   taken: number;
 };
-
-export type Room = {
-  id: string;
-  name: string;
-};

@@ -25,12 +25,3 @@ export const offerSelect: Prisma.OfferSelect = {
   image: true,
   vehicle: true,
 };
-
-export const currentOfferSelect: Prisma.OfferSelect = {
-  room: {
-    select: {
-      id: true,
-      name: true,
-    },
-  },
-};

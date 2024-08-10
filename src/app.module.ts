@@ -11,21 +11,24 @@ import { RedisModule } from './redis/redis.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './redis/redis.resolver';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ErrorModule } from './error/error.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     CacheModule.registerAsync(RedisOptions),
+    ErrorModule,
     PrismaModule,
     FirebaseModule,
     RedisModule,
-    AuthModule,
     UserModule,
+    AuthModule,
     OfferModule,
-    ChatModule,
     ReviewsModule,
+    RoomModule,
+    ChatModule,
   ],
-  controllers: [],
   providers: [PrismaService],
 })
 export class AppModule {}

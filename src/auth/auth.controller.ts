@@ -1,17 +1,17 @@
-import { Controller, HttpStatus, Logger, Req } from '@nestjs/common';
+import { Controller, HttpStatus, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
-import { TsRestException, tsRestHandler, TsRestHandler } from '@ts-rest/nest';
+import { tsRestHandler, TsRestHandler } from '@ts-rest/nest';
 import { authContract } from './auth-contract';
 import { Auth } from './decorator/auth.decorator';
 import { ReqWithUser } from './request/req-user';
 import { Prisma } from '@prisma/client';
+import { ErrorService } from 'src/error/error.service';
 
 @Controller()
 export class AuthController {
-  private readonly logger = new Logger(AuthController.name);
-
   constructor(
+    private readonly errorService: ErrorService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
@@ -38,14 +38,7 @@ export class AuthController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /register: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'check');
       }
     });
   }
@@ -80,14 +73,7 @@ export class AuthController {
           },
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /register: ${error}`);
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'register');
       }
     });
   }
@@ -115,15 +101,7 @@ export class AuthController {
           };
         }
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /login: ${error}`);
-
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'login');
       }
     });
   }
@@ -143,15 +121,7 @@ export class AuthController {
           body: null,
         };
       } catch (error) {
-        if (error instanceof TsRestException) throw error;
-        this.logger.error(`Error at /logout: ${error}`);
-
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          body: {
-            message: 'Internal server error',
-          },
-        };
+        await this.errorService.handleApiError(error, 'logout');
       }
     });
   }

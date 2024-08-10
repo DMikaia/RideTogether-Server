@@ -1,73 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Offer, Room } from './dto/offer.dto';
-import { offerSelect, currentOfferSelect } from './select/offer.select';
+import { Offer } from './dto/offer.dto';
+import { offerSelect } from './select/offer.select';
 
 @Injectable()
 export class OfferService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  async getUserOffer(userId: string): Promise<Offer[]> {
-    return await this.prismaService.client.offer.findMany({
-      where: {
-        ownerId: userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: offerSelect,
-    });
-  }
-
-  async getAvailableOffers(userId: string): Promise<Offer[]> {
-    return await this.prismaService.client.offer.findMany({
-      where: {
-        closed: false,
-        NOT: {
-          OR: [
-            { ownerId: userId },
-            {
-              participants: {
-                some: {
-                  id: userId,
-                },
-              },
-            },
-          ],
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: offerSelect,
-    });
-  }
-
-  async getMyCurrentOffer(userId: string): Promise<Room[]> {
-    const offers = await this.prismaService.client.offer.findMany({
-      where: {
-        closed: false,
-        OR: [
-          { ownerId: userId },
-          {
-            participants: {
-              some: {
-                id: userId,
-              },
-            },
-          },
-        ],
-      },
-      select: currentOfferSelect,
-    });
-
-    const rooms: Room[] = offers.map((offer) => {
-      return offer.room;
-    });
-
-    return rooms;
-  }
 
   async createOffer(
     ownerId: string,
@@ -154,6 +93,42 @@ export class OfferService {
           },
         },
       },
+    });
+  }
+
+  async getUserOffer(userId: string): Promise<Offer[]> {
+    return await this.prismaService.client.offer.findMany({
+      where: {
+        ownerId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: offerSelect,
+    });
+  }
+
+  async getAvailableOffers(userId: string): Promise<Offer[]> {
+    return await this.prismaService.client.offer.findMany({
+      where: {
+        closed: false,
+        NOT: {
+          OR: [
+            { ownerId: userId },
+            {
+              participants: {
+                some: {
+                  id: userId,
+                },
+              },
+            },
+          ],
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: offerSelect,
     });
   }
 }
