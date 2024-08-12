@@ -27,16 +27,6 @@ Here are the current features right now:
 
 ## Prerequisites
 
-To be able to run the app you'll need to install:
-
-- [nodejs](https://nodejs.org/)
-- [npm](https://www.npmjs.com/)
-- [nest-cli](https://docs.nestjs.com/cli/overview#installation)
-- [docker](https://docs.docker.com)
-- [firebase-project](https://firebase.google.com)
-
-For the database I am using:
-
 > [!NOTE]
 > I've only installed the redis stack with docker, but you can also add the postgresql container. All you need to do is modify the [docker-compose.yml](docker-compose.yml) file to add the new container and use prisma studio to view the database, so using pgAdmin is optional.
 >
@@ -45,6 +35,13 @@ For the database I am using:
 > $ npx prisma studio
 > ```
 
+To be able to run the app you'll need to install:
+
+- [nodejs](https://nodejs.org/)
+- [npm](https://www.npmjs.com/)
+- [nest-cli](https://docs.nestjs.com/cli/overview#installation)
+- [docker](https://docs.docker.com)
+- [firebase-project](https://firebase.google.com)
 - [pgAdmin](https://www.pgadmin.org/download/)
 
 ## Installation
