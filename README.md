@@ -82,7 +82,7 @@ REDIS_PASSWORD=
 ## Running the app
 
 > [!IMPORTANT]
-> You'll also need to configure the firebase project and add authentication (email and password) and storage, otherwise authentication and image storage won't work properly on either the server or client side. If you are not yet familiar with firebase, you may wish to consult the [documentation](https://firebase.google.com/docs)
+> You'll also need to configure the firebase project and add authentication (e-mail and password) and storage, otherwise image authentication and storage won't work properly on either the server or client side. If you are not yet familiar with firebase, check out the [documentation](https://firebase.google.com/docs).
 
 ```bash
 # development
@@ -98,7 +98,7 @@ $ npm run start:prod
 ## Testing
 
 > [!WARNING]
-> I still have to set up tests for all controllers, providers and services, so the tests are not yet available.
+> For the moment, unit tests are not available.
 
 ```bash
 # unit tests
