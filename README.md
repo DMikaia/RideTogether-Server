@@ -17,13 +17,13 @@ This is the server part of my team's school project called **Ride Together** (ca
 
 Here are the current features right now:
 
-- Basic authentication with Firebase & PostgreSQL
+- Basic authentication with Firebase
+- Data caching with [Redis](https://redis.io)
 - User (create, update, getOne)
 - Offer (creation, update, get, getAll)
-- Room (getAll)
 - Review (creation, update, delete, getAll)
+- Room (getAll)
 - Live chat using websocket (Not scalable yet)
-- Data caching with [Redis](https://redis.io)
 
 ## Prerequisites
 
@@ -98,7 +98,7 @@ $ npm run start:prod
 ## Testing
 
 > [!WARNING]
-> For the moment, unit tests are not available.
+> At the moment, the tests are not available, so I've yet to implement them.
 
 ```bash
 # unit tests
