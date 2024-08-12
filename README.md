@@ -28,7 +28,7 @@ Here are the current features right now:
 ## Prerequisites
 
 > [!NOTE]
-> I've only installed the redis stack with docker, but you can also add the postgresql container. All you need to do is modify the [docker-compose.yml](docker-compose.yml) file to add the new container and use prisma studio to view the database, so using pgAdmin is optional.
+> Using pgAdmin is optional, you can modify the [docker-compose.yml](docker-compose.yml) file to add the new postgresql service and use prisma to view the database.
 >
 > ```bash
 > # command
