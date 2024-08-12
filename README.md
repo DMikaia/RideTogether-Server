@@ -41,7 +41,7 @@ To be able to run the app you'll need to install:
 - [npm](https://www.npmjs.com/)
 - [nest-cli](https://docs.nestjs.com/cli/overview#installation)
 - [docker](https://docs.docker.com)
-- [firebase-project](https://firebase.google.com)
+- [firebase project](https://firebase.google.com)
 - [pgAdmin](https://www.pgadmin.org/download/)
 
 ## Installation
