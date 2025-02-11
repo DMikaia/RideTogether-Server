@@ -27,7 +27,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.15",
-    "@nestjs/platform-socket.io": "^10.3.10",
+    "@nestjs/platform-socket.io": "^10.4.15",
     "@nestjs/websockets": "^10.3.10",
     "@prisma/client": "^5.17.0",
     "@ts-rest/core": "^3.48.1",
